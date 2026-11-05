@@ -1,0 +1,34 @@
+{
+  "exp": "biji_yuwen_v1_clean",
+  "best_epoch": 40,
+  "val": {
+    "EER": 15.01,
+    "AUC": 0.8499,
+    "threshold": 1.2573,
+    "n_same": 6310,
+    "n_diff": 6310,
+    "Recall@FAR0.5%": 27.19,
+    "Recall@FAR1%": 40.27,
+    "Recall@FAR5%": 67.43,
+    "Recall@FAR10%": 78.73,
+    "Precision": 84.99,
+    "Recall": 85.01,
+    "F1": 85.0,
+    "Accuracy": 85.0
+  },
+  "test": {
+    "EER": 13.0,
+    "AUC": 0.87,
+    "threshold": 1.2612,
+    "n_same": 7280,
+    "n_diff": 7280,
+    "Recall@FAR0.5%": 33.05,
+    "Recall@FAR1%": 45.58,
+    "Recall@FAR5%": 72.72,
+    "Recall@FAR10%": 83.7,
+    "Precision": 87.0,
+    "Recall": 86.96,
+    "F1": 86.98,
+    "Accuracy": 86.98
+  }
+}

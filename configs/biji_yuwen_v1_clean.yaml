@@ -1,0 +1,66 @@
+# ============================================================
+# 笔迹代写检测 · 训练配置
+# 用法: python train.py --config /root/wzg/configs/biji_yuwen_v1.yaml
+# 结果目录: /root/wzg/results/biji_results/<配置文件前缀>/
+# ============================================================
+
+# ---- 实验标识（结果目录名 = 去掉.yaml 的文件名）----
+exp_name: biji_yuwen_v1_clean
+
+# ---- 数据 ----
+data:
+  manifest: /root/wzg/dataset/manifest.json      # lines 清单: path/person/split/label
+  image_size: 224
+  # 预处理：灰度 + 字高归一化已在离线完成，这里只做 resize
+  num_workers: 8
+  # PK 采样
+  P: 10          # 每个 batch 的考生数
+  K: 4           # 每个考生的行数
+  train_split: train
+  val_split: val
+  test_split: test
+
+# ---- 模型 ----
+model:
+  backbone: convnext_tiny
+  pretrained: true
+  embed_dim: 512
+  neck: bn_prelu   # Linear->BN1d->PReLU->Linear->L2norm
+
+# ---- 损失 ----
+loss:
+  arcface:
+    weight: 1.0
+    s: 32.0
+    margin: 0.35
+  supcon:
+    weight: 0.5
+    temperature: 0.08
+
+# ---- 训练 ----
+train:
+  epochs: 40
+  steps_per_epoch: 400
+  optimizer: adamw
+  lr: 3.0e-4
+  weight_decay: 0.05
+  warmup_epochs: 3
+  scheduler: cosine
+  # 多卡：DDP
+  distributed: true
+  gpus: [0, 1, 2, 3]     # 指定可用卡；[] 表示自动用全部
+  amp: true              # 混合精度
+  seed: 0
+
+# ---- 评估 ----
+eval:
+  eval_every: 2          # 每 N 个 epoch 在 val 上评估
+  max_pair_ratio: 20000  # 最多采样的正样本对数（0=全量）
+  far_list: [0.5, 1, 5, 10]   # 报告这些 FAR 下的指标
+  eval_test_at_end: true
+
+# ---- 输出 ----
+output:
+  root: /root/wzg/results/biji_results
+  save_best: true
+  save_last: true

@@ -1,0 +1,56 @@
+# ============================================================
+# 笔迹代写检测 v2 —— 全量数据（语文 55975 行 + 作文 157151 行）
+# 用法: torchrun --nproc_per_node=4 train.py --config /root/wzg/configs/biji_full_v2.yaml
+# 结果: /root/wzg/results/biji_results/biji_full_v2/
+# ============================================================
+
+exp_name: biji_full_v2
+
+data:
+  manifest: /root/wzg/dataset/manifest.json
+  image_size: 224
+  num_workers: 8
+  P: 12          # 每 batch 考生数（原 10）
+  K: 4           # 每考生行数
+  train_split: train
+  val_split: val
+  test_split: test
+
+model:
+  backbone: convnext_tiny
+  pretrained: true
+  embed_dim: 512
+  neck: bn_prelu
+
+loss:
+  arcface:
+    weight: 1.0
+    s: 32.0
+    margin: 0.35
+  supcon:
+    weight: 0.5
+    temperature: 0.08
+
+train:
+  epochs: 60          # 数据量 21 倍，需要更多轮
+  steps_per_epoch: 400
+  optimizer: adamw
+  lr: 3.0e-4
+  weight_decay: 0.05
+  warmup_epochs: 4
+  scheduler: cosine
+  distributed: true
+  gpus: [0, 1, 2, 3]
+  amp: true
+  seed: 0
+
+eval:
+  eval_every: 2
+  max_pair_ratio: 30000
+  far_list: [0.5, 1, 5, 10]
+  eval_test_at_end: true
+
+output:
+  root: /root/wzg/results/biji_results
+  save_best: true
+  save_last: true
